@@ -10,7 +10,7 @@
 
 ### 简介
 
-Grecey 的调整模组是一个面向 Factorio 2.1 的可配置调整模组.
+Grecey 的 Factorio 2.1 可配置调整模组.
 
 本模组提供世界, 资源, 角色, 实体, 物品, 装备, 配方, 科技, 成就, 快捷方式和实用功能等多方面的调整. 大部分功能均可通过启动设置单独启用或关闭.
 
@@ -35,16 +35,17 @@ Grecey 的调整模组是一个面向 Factorio 2.1 的可配置调整模组.
 
 **资源**
 
+- 添加可像原油一样开采的地下水资源.
 - 使可重复开采的资源保持无限, 并维持 100% 的开采产量.
 
 **角色**
 
 - 在游戏开始时清空角色的所有库存和装备.
 - 在游戏开始时给予热能采矿机.
-- 在游戏开始时给予建造套装.
+- 在游戏开始时给予建设套装.
 - 在游戏开始时给予武器和弹药.
 - 调整角色制造速度.
-- 调整角色生命恢复速度.
+- 调整角色生命值恢复速度.
 - 调整角色建造, 常规交互和资源交互距离.
 - 调整角色最大生命值.
 - 调整角色采矿速度.
@@ -94,7 +95,6 @@ Grecey 的调整模组是一个面向 Factorio 2.1 的可配置调整模组.
 **快捷方式**
 
 - 在游戏开始时自动启用 ALT 模式.
-- 显示地下传送带和地下管道的最远连接位置.
 
 **实用功能**
 
@@ -130,7 +130,7 @@ Grecey 的调整模组是一个面向 Factorio 2.1 的可配置调整模组.
 
 ### Overview
 
-Grecey's Tweak Mod is a configurable tweak mod for Factorio 2.1.
+A configurable tweak mod for Factorio 2.1 by Grecey.
 
 The mod provides adjustments for worlds, resources, characters, entities, items, equipment, recipes, technologies, achievements, shortcuts, and utilities. Most features can be enabled or disabled independently through startup settings.
 
@@ -155,6 +155,7 @@ Optional compatibility features are loaded only when their corresponding mods ar
 
 **Resources**
 
+- Adds ground water as a resource that can be extracted like crude oil.
 - Makes repeatedly mineable resources infinite while maintaining a 100% mining yield.
 
 **Characters**

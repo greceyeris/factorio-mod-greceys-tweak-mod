@@ -34,6 +34,12 @@ data:extend{
         setting_type = "startup",
         default_value = false,
         order = "a[enable]-c[resource]"
+    }, {
+        type = "bool-setting",
+        name = "enable-mineable-ground-water-resource",
+        setting_type = "startup",
+        default_value = false,
+        order = "a[enable]-c[resource]"
     }, -- a[enable]-d[character]
     {
         type = "bool-setting",

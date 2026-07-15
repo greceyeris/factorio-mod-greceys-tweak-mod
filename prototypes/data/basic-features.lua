@@ -594,3 +594,100 @@ if settings.startup["enable-void-chest-and-void-pipe"].value then
         data:extend({void_pipe_recipe, pipe_from_void_pipe_recipe})
     end
 end
+
+--
+--
+--
+
+-- 水资源
+if settings.startup["enable-mineable-ground-water-resource"].value then
+    -- 修复资源的问题
+    -- 注册资源和自动放置控制
+    if resource_exist("crude-oil") then
+        local resource_autoplace = require("resource-autoplace")
+        local water_blue_tint = {r = 0.15, g = 0.60, b = 1.00, a = 0.70}
+
+        -- 注册资源 ground_water_resource
+        local crude_oil_resource = data.raw["resource"]["crude-oil"]
+        local ground_water_resource = table.deepcopy(crude_oil_resource)
+
+        ground_water_resource.name = "ground-water"
+        ground_water_resource.minable.results[1].name = "water"
+        ground_water_resource.icons = {
+            {
+                icon = ground_water_resource.icon,
+                icon_size = ground_water_resource.icon_size or 64,
+                tint = water_blue_tint
+            }
+        }
+        ground_water_resource.map_color = water_blue_tint
+        ground_water_resource.stages.sheet.tint = water_blue_tint
+        ground_water_resource.stages.sheet.tint_as_overlay = true
+
+        for visualisation_index = #(ground_water_resource.stateless_visualisation or
+            {}), 1, -1 do
+            local visualisation =
+                ground_water_resource.stateless_visualisation[visualisation_index]
+
+            if visualisation.render_layer == "smoke" then
+                table.remove(ground_water_resource.stateless_visualisation,
+                             visualisation_index)
+            elseif visualisation.animation then
+                visualisation.animation.tint = water_blue_tint
+                visualisation.animation.tint_as_overlay = true
+            end
+        end
+
+        resource_autoplace.initialize_patch_set("ground-water", false)
+        ground_water_resource.autoplace =
+            resource_autoplace.resource_autoplace_settings({
+                name = "ground-water",
+                order = "c",
+                base_density = 8.2,
+                base_spots_per_km2 = 1.8,
+                random_probability = 1 / 48,
+                random_spot_size_minimum = 1,
+                random_spot_size_maximum = 1,
+                additional_richness = 220000,
+                has_starting_area_placement = false,
+                regular_rq_factor_multiplier = 1
+            })
+
+        -- 注册自动放置控制 ground_water_autoplace_control
+        local crude_oil_autoplace_control =
+            data.raw["autoplace-control"]["crude-oil"]
+        local ground_water_autoplace_control = table.deepcopy(
+                                                   crude_oil_autoplace_control)
+
+        ground_water_autoplace_control.name = "ground-water"
+        ground_water_autoplace_control.order = "a-e-1"
+        ground_water_autoplace_control.localised_name = {
+            "", "[entity=ground-water] ", {"entity-name.ground-water"}
+        }
+
+        data:extend({ground_water_resource, ground_water_autoplace_control})
+
+        -- 允许在 nauvis 生成并显示其资源设置
+        if data.raw["planet"]["nauvis"] then
+            local nauvis = data.raw["planet"]["nauvis"]
+
+            nauvis.map_gen_settings.autoplace_controls["ground-water"] = {}
+            nauvis.map_gen_settings.autoplace_settings["entity"].settings["ground-water"] =
+                {}
+        end
+
+        -- 修复模组的问题
+        -- 修复模组 space-age 的问题
+        if mod_enabled("space-age") then
+            -- 修复资源放置控制的问题
+            -- 允许在 aquilo 生成并显示其资源设置
+            if data.raw["planet"]["aquilo"] then
+                local aquilo = data.raw["planet"]["aquilo"]
+
+                aquilo.map_gen_settings.autoplace_controls["ground-water"] = {}
+                aquilo.map_gen_settings.autoplace_settings["entity"].settings["ground-water"] =
+                    {}
+            end
+        end
+    end
+end

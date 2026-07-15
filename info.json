@@ -1,7 +1,7 @@
 {
     "name": "greceys-tweak-mod",
     "title": "Grecey's Tweak Mod",
-    "version": "21.1.0",
+    "version": "21.2.0",
     "author": "Grecey Eris",
     "factorio_version": "2.1",
     "dependencies": [
@@ -12,8 +12,8 @@
         "? recycler >= 2.1",
         "? space-age >= 2.1",
 
-        "greceys-library-mod"
+        "greceys-library-mod >= 21.2.0"
     ],
-    "description": "这是一个以原版为核心, 结合其他可选模组和模组包制作的 Factorio 2.1 调整模组.",
+    "description": "这是一个以原版为核心, 结合其他可选模组和模组包制作的 Factorio 2.1 可配置调整模组.",
     "license": "Apache-2.0"
 }

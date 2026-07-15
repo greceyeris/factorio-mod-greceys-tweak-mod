@@ -1,4 +1,15 @@
 ---------------------------------------------------------------------------------------------------
+Version: 21.2.0
+Date: 2026-07-16
+  Features:
+    - Resource features:
+      - Added a mineable ground water resource to Nauvis.
+
+  Compatibility:
+    - Space Age Mod features:
+      - Resource features:
+        - Added a mineable ground water resource to Aquilo.
+---------------------------------------------------------------------------------------------------
 Version: 21.1.0
 Date: 2026-07-15
   Features:
