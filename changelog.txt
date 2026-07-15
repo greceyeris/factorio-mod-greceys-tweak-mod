@@ -1,4 +1,85 @@
 ---------------------------------------------------------------------------------------------------
+Version: 21.1.0
+Date: 2026-07-15
+  Features:
+    - World features:
+      - Added Enable Always Day Mode at Game Start.
+      - Added Remove Crash Site at Game Start.
+    - Resource features:
+      - Added Infinite Resources.
+    - Character features:
+      - Added Clear All Inventories and Equipment at Game Start.
+      - Added Give Burner Mining Drill at Game Start.
+      - Added Give Construction Kit at Game Start.
+      - Added Give Weapon at Game Start.
+    - Entity features:
+      - Added Allow All Machines to Use All Modules.
+      - Added Disable Inserter Overloading.
+      - Added Electric Furnaces.
+      - Added Electric Pole Free Lighting Mode.
+      - Added Furnace Recipe Selection.
+      - Added Mining Drill Item Filter Mode.
+      - Added Place Offshore Pumps Anywhere.
+      - Added Remove Pipeline Extent Limit.
+      - Added Void Chest and Void Pipe.
+      - Added Remove Decorations.
+    - Item features:
+      - Added Waterfill.
+    - Equipment features:
+      - Added Modify All Equipment Grid Occupancy Sizes to 1×1.
+        - Recipe features:
+      - Added Allow All Recipes to Use All Modules.
+      - Added Always Show Recipe Made In.
+    - Recipe features:
+      - Added Allow All Recipes to Use All Modules.
+      - Added Always Show Recipe Made In.
+    - Technology features:
+      - Added Automatically Research Worker Robot Speed at Game Start.
+      - Added Display All Hidden Technologies.
+      - Added Optimize Technology Tree.
+    - Achievement features:
+      - Added Remove Achievement Restrictions.
+    - Shortcut features:
+      - Added Enable ALT Mode at Game Start.
+    - Utility features:
+      - Added Show Farthest Distance Position.
+    - Character adjustments:
+      - Added Character Crafting Speed Multiplier.
+      - Added Character Health Regeneration Speed Multiplier.
+      - Added Character Interaction Distance Multiplier.
+      - Added Character Maximum Health Multiplier.
+      - Added Character Mining Speed Multiplier.
+      - Added Character Respawn Speed Multiplier.
+      - Added Character Running Speed Multiplier.
+    - Entity adjustments:
+      - Added Inserter Speed Multiplier.
+      - Added Robot Speed Multiplier.
+      - Added Transport Belt Speed Multiplier.
+    - Item adjustments:
+      - Added Item Stack Size Multiplier.
+
+  Compatibility:
+    - Quality Mod features:
+      - Recipe features:
+        - Allow Quality Selection for All Recipes.
+    - Recycler Mod features:
+      - Recipe features:
+        - Remove All Recycling Recipes.
+    - Space Age Mod features:
+      - Entity features:
+        - Remove Machine Freezing.
+      - Item features:
+        - Remove Item Spoilage.
+
+  Graphics:
+    - Added shortcut and farthest-distance visualization graphics.
+
+  Locale:
+    - Added English and Simplified Chinese localization.
+
+  Modding:
+    - Added Grecey's Library Mod as a required dependency for shared data-stage and runtime helper functions.
+---------------------------------------------------------------------------------------------------
 Version: 21.0.0
 Date: 2026-07-15
   Changes:

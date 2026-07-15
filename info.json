@@ -1,0 +1,19 @@
+{
+    "name": "greceys-tweak-mod",
+    "title": "Grecey's Tweak Mod",
+    "version": "21.1.0",
+    "author": "Grecey Eris",
+    "factorio_version": "2.1",
+    "dependencies": [
+        "base >= 2.1",
+
+        "? elevated-rails >= 2.1",
+        "? quality >= 2.1",
+        "? recycler >= 2.1",
+        "? space-age >= 2.1",
+
+        "greceys-library-mod"
+    ],
+    "description": "这是一个以原版为核心, 结合其他可选模组和模组包制作的 Factorio 2.1 调整模组.",
+    "license": "Apache-2.0"
+}
