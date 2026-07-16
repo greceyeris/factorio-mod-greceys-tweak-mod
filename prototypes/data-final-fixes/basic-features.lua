@@ -77,6 +77,25 @@ end
 --
 --
 
+-- 显示并启用所有隐藏科技
+if settings.startup["enable-display-all-hidden-technologies"].value then
+    for technology_id, technology in pairs(data.raw["technology"]) do
+        if technology.hidden == true or
+            (technology.enabled == false and technology.visible_when_disabled ~=
+                true) then
+            log("Technology " .. technology_id .. " was originally hidden.")
+
+            technology.hidden = false
+            technology.enabled = true
+            technology.visible_when_disabled = false
+        end
+    end
+end
+
+--
+--
+--
+
 -- 电线杆照明模式
 if settings.startup["enable-electric-pole-free-lighting-mode"].value then
     -- 修复实体的问题
@@ -208,54 +227,113 @@ end
 --
 --
 
--- 显示最远距离位置
-if settings.startup["enable-show-farthest-distance-position"].value then
-    local farthest_distance_position_sprite =
-        "__greceys-tweak-mod__/graphics/visualisation/farthest-distance-position.png"
+-- 优化科技树
+-- 定义函数 has_prerequisite
+local function has_prerequisite(technology_id, prerequisite_id,
+                                current_technology_id, visited)
+    if technology_id == current_technology_id then return false end
+    if visited[technology_id] then return false end
 
-    -- 地下传送带
-    for _, entity in pairs(data.raw["underground-belt"]) do
-        local max_distance = entity.max_distance + 1
+    visited[technology_id] = true
 
-        entity.radius_visualisation_specification = {
-            sprite = {
-                filename = farthest_distance_position_sprite,
-                width = 64,
-                height = 64,
-                tint = {r = 1, g = 1, b = 0, a = 1}
-            },
-            distance = 0.5,
-            offset = {0, -max_distance},
-            draw_in_cursor = true,
-            draw_on_selection = true
-        }
-    end
+    local technology = data.raw["technology"][technology_id]
 
-    -- 地下管道
-    for _, entity in pairs(data.raw["pipe-to-ground"]) do
-        local max_distance
+    if technology == nil or technology.prerequisites == nil then return false end
 
-        for _, connection in pairs(entity.fluid_box.pipe_connections) do
-            if connection.max_underground_distance then
-                max_distance = connection.max_underground_distance + 1
-                break
+    for _, prerequisite in ipairs(technology.prerequisites) do
+        if prerequisite ~= current_technology_id then
+            if prerequisite == prerequisite_id or
+                has_prerequisite(prerequisite, prerequisite_id,
+                                 current_technology_id, visited) then
+                return true
             end
         end
+    end
 
-        if max_distance then
-            entity.radius_visualisation_specification = {
-                sprite = {
-                    filename = farthest_distance_position_sprite,
-                    width = 64,
-                    height = 64,
-                    tint = {r = 1, g = 1, b = 0, a = 1}
-                },
-                distance = 0.5,
-                offset = {0, -max_distance},
-                draw_in_cursor = true,
-                draw_on_selection = true
-            }
+    return false
+end
+
+if settings.startup["enable-optimize-technology-tree"].value then
+    -- 删除递归前置科技
+    for technology_id, technology in pairs(data.raw["technology"]) do
+        local prerequisites = technology.prerequisites
+
+        if prerequisites and #prerequisites > 1 then
+            local optimized_prerequisites = {}
+
+            for _, prerequisite in ipairs(prerequisites) do
+                local redundant = false
+
+                for _, other_prerequisite in ipairs(prerequisites) do
+                    if prerequisite ~= other_prerequisite and
+                        has_prerequisite(other_prerequisite, prerequisite,
+                                         technology_id, {}) then
+                        redundant = true
+                        break
+                    end
+                end
+
+                if not redundant then
+                    table.insert(optimized_prerequisites, prerequisite)
+                end
+            end
+
+            technology.prerequisites = optimized_prerequisites
         end
+    end
+
+    -- 输出被不同科技重复解锁的配方
+    local recipe_unlock_technologies = {}
+
+    for technology_id, technology in pairs(data.raw["technology"]) do
+        if technology.effects then
+            for _, effect in ipairs(technology.effects) do
+                if effect.type == "unlock-recipe" and effect.recipe then
+                    recipe_unlock_technologies[effect.recipe] =
+                        recipe_unlock_technologies[effect.recipe] or {}
+
+                    recipe_unlock_technologies[effect.recipe][technology_id] =
+                        true
+                end
+            end
+        end
+    end
+
+    for recipe_id, technology_set in pairs(recipe_unlock_technologies) do
+        local technology_ids = {}
+
+        for technology_id in pairs(technology_set) do
+            table.insert(technology_ids, technology_id)
+        end
+
+        if #technology_ids > 1 then
+            log("Recipe " .. recipe_id .. " is unlocked by technologies: " ..
+                    table.concat(technology_ids, ", "))
+        end
+    end
+
+    -- 输出效果为空的科技
+    for technology_id, technology in pairs(data.raw["technology"]) do
+        if technology.effects == nil or next(technology.effects) == nil then
+            log("Technology " .. technology_id .. " has no effects.")
+        end
+    end
+end
+
+-- 随地放置抽水泵
+if settings.startup["enable-place-offshore-pumps-anywhere"].value then
+    -- 修复地块的问题
+    -- 遍历所有地块
+    for _, tile in pairs(data.raw["tile"]) do
+        -- 给没有流体属性的地块添加流体水
+        if tile.fluid == nil then tile.fluid = "water" end
+    end
+
+    -- 修复实体的问题
+    -- 修复实体 offshore-pump 的问题
+    if entity_exist("offshore-pump", "offshore-pump") then
+        table.remove(data.raw["offshore-pump"]["offshore-pump"]
+                         .tile_buildability_rules, 2)
     end
 end
 
@@ -291,6 +369,83 @@ if settings.startup["enable-remove-pipeline-extent-limit"].value then
     end
 
     remove_pipeline_extent(data.raw)
+end
+
+--
+--
+--
+
+-- 显示最远距离位置
+if settings.startup["enable-show-farthest-distance-position"].value then
+    local farthest_distance_position_sprite =
+        "__greceys-tweak-mod__/graphics/visualisation/farthest-distance-position.png"
+
+    -- 地下传送带
+    if data.raw["underground-belt"] then
+        for _, entity in pairs(data.raw["underground-belt"]) do
+            local max_distance = entity.max_distance + 1
+
+            entity.radius_visualisation_specification = {
+                sprite = {
+                    filename = farthest_distance_position_sprite,
+                    width = 64,
+                    height = 64
+                },
+                distance = 0.5,
+                offset = {0, -max_distance},
+                draw_in_cursor = true,
+                draw_on_selection = true
+            }
+        end
+    end
+
+    -- 地下管道
+    if data.raw["pipe-to-ground"] then
+        for _, entity in pairs(data.raw["pipe-to-ground"]) do
+            local max_distance
+
+            for _, connection in pairs(entity.fluid_box.pipe_connections) do
+                if connection.max_underground_distance then
+                    max_distance = connection.max_underground_distance + 1
+                    break
+                end
+            end
+
+            if max_distance then
+                entity.radius_visualisation_specification = {
+                    sprite = {
+                        filename = farthest_distance_position_sprite,
+                        width = 64,
+                        height = 64
+                    },
+                    distance = 0.5,
+                    offset = {0, -max_distance},
+                    draw_in_cursor = true,
+                    draw_on_selection = true
+                }
+            end
+        end
+    end
+end
+
+--
+--
+--
+
+-- 虚空箱和虚空管
+if settings.startup["enable-void-chest-and-void-pipe"].value then
+    -- 修复实体的问题
+    -- 修复实体 void_pipe_entity 的问题
+    if entity_exist("pipe", "pipe") then
+        local pipe_entity = data.raw["pipe"]["pipe"]
+        local void_pipe_entity = data.raw["pipe"]["void-pipe"]
+
+        if pipe_entity and void_pipe_entity then
+            void_pipe_entity.fluid_box.pipe_connections = table.deepcopy(
+                                                              pipe_entity.fluid_box
+                                                                  .pipe_connections)
+        end
+    end
 end
 
 --
@@ -554,135 +709,3 @@ if transport_belt_speed_multiplier ~= 1 then
     end
 end
 
---
---
---
-
--- 显示并启用所有隐藏科技
-if settings.startup["enable-display-all-hidden-technologies"].value then
-    for technology_id, technology in pairs(data.raw["technology"]) do
-        if technology.hidden == true or
-            (technology.enabled == false and technology.visible_when_disabled ~=
-                true) then
-            log("Technology " .. technology_id .. " was originally hidden.")
-
-            technology.hidden = false
-            technology.enabled = true
-            technology.visible_when_disabled = false
-        end
-    end
-end
-
---
---
---
-
--- 优化科技树
--- 定义函数 has_prerequisite
-local function has_prerequisite(technology_id, prerequisite_id,
-                                current_technology_id, visited)
-    if technology_id == current_technology_id then return false end
-    if visited[technology_id] then return false end
-
-    visited[technology_id] = true
-
-    local technology = data.raw["technology"][technology_id]
-
-    if technology == nil or technology.prerequisites == nil then return false end
-
-    for _, prerequisite in ipairs(technology.prerequisites) do
-        if prerequisite ~= current_technology_id then
-            if prerequisite == prerequisite_id or
-                has_prerequisite(prerequisite, prerequisite_id,
-                                 current_technology_id, visited) then
-                return true
-            end
-        end
-    end
-
-    return false
-end
-
-if settings.startup["enable-optimize-technology-tree"].value then
-    -- 删除递归前置科技
-    for technology_id, technology in pairs(data.raw["technology"]) do
-        local prerequisites = technology.prerequisites
-
-        if prerequisites and #prerequisites > 1 then
-            local optimized_prerequisites = {}
-
-            for _, prerequisite in ipairs(prerequisites) do
-                local redundant = false
-
-                for _, other_prerequisite in ipairs(prerequisites) do
-                    if prerequisite ~= other_prerequisite and
-                        has_prerequisite(other_prerequisite, prerequisite,
-                                         technology_id, {}) then
-                        redundant = true
-                        break
-                    end
-                end
-
-                if not redundant then
-                    table.insert(optimized_prerequisites, prerequisite)
-                end
-            end
-
-            technology.prerequisites = optimized_prerequisites
-        end
-    end
-
-    -- 输出被不同科技重复解锁的配方
-    local recipe_unlock_technologies = {}
-
-    for technology_id, technology in pairs(data.raw["technology"]) do
-        if technology.effects then
-            for _, effect in ipairs(technology.effects) do
-                if effect.type == "unlock-recipe" and effect.recipe then
-                    recipe_unlock_technologies[effect.recipe] =
-                        recipe_unlock_technologies[effect.recipe] or {}
-
-                    recipe_unlock_technologies[effect.recipe][technology_id] =
-                        true
-                end
-            end
-        end
-    end
-
-    for recipe_id, technology_set in pairs(recipe_unlock_technologies) do
-        local technology_ids = {}
-
-        for technology_id in pairs(technology_set) do
-            table.insert(technology_ids, technology_id)
-        end
-
-        if #technology_ids > 1 then
-            log("Recipe " .. recipe_id .. " is unlocked by technologies: " ..
-                    table.concat(technology_ids, ", "))
-        end
-    end
-
-    -- 输出效果为空的科技
-    for technology_id, technology in pairs(data.raw["technology"]) do
-        if technology.effects == nil or next(technology.effects) == nil then
-            log("Technology " .. technology_id .. " has no effects.")
-        end
-    end
-end
-
--- 随地放置抽水泵
-if settings.startup["enable-place-offshore-pumps-anywhere"].value then
-    -- 修复地块的问题
-    -- 遍历所有地块
-    for _, tile in pairs(data.raw["tile"]) do
-        -- 给没有流体属性的地块添加流体水
-        if tile.fluid == nil then tile.fluid = "water" end
-    end
-
-    -- 修复实体的问题
-    -- 修复实体 offshore-pump 的问题
-    if entity_exist("offshore-pump", "offshore-pump") then
-        table.remove(data.raw["offshore-pump"]["offshore-pump"]
-                         .tile_buildability_rules, 2)
-    end
-end

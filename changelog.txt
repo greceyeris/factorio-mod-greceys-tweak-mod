@@ -1,4 +1,13 @@
 ---------------------------------------------------------------------------------------------------
+Version: 21.2.1
+Date: 2026-07-16
+  Bugfixes:
+    - Fixed void pipes being unable to connect to other pipes.
+    - Fixed a crash caused by void chest and void pipe cleanup running when the Void Chest and Void Pipe feature was disabled.
+
+  Graphics:
+    - Modified the farthest-distance-position visualization graphic and removed its tint.
+---------------------------------------------------------------------------------------------------
 Version: 21.2.0
 Date: 2026-07-16
   Features:
@@ -83,7 +92,7 @@ Date: 2026-07-15
         - Remove Item Spoilage.
 
   Graphics:
-    - Added shortcut and farthest-distance visualization graphics.
+    - Added always-day shortcut and farthest-distance-position visualization graphics.
 
   Locale:
     - Added English and Simplified Chinese localization.

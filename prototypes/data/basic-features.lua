@@ -300,305 +300,6 @@ end
 --
 --
 
--- 造水料
-if settings.startup["enable-waterfill"].value then
-    -- 修复物品的问题
-    -- 注册物品 waterfill
-    if item_exist("landfill") then
-        local landfill_item = data.raw["item"]["landfill"]
-        local waterfill_item = table.deepcopy(landfill_item)
-
-        waterfill_item.name = "waterfill"
-        waterfill_item.icon =
-            "__base__/graphics/terrain/water-shallow/water-shallow-o.png"
-        waterfill_item.icons = nil
-        waterfill_item.order = (landfill_item.order or "a[landfill]") ..
-                                   "-a[waterfill]"
-        waterfill_item.place_as_tile = {
-            result = "water",
-            condition_size = 1,
-            condition = {layers = {ground_tile = true}}
-        }
-
-        data:extend({waterfill_item})
-    end
-
-    -- 修复配方的问题
-    -- 注册配方 waterfill
-    data:extend({
-        {
-            type = "recipe",
-            name = "waterfill",
-            order = "a",
-            categories = {"crafting-with-fluid"},
-            ingredients = {{type = "fluid", name = "water", amount = 200}},
-            results = {{type = "item", name = "waterfill", amount = 1}},
-            main_product = "waterfill",
-            enabled = false
-        }
-    })
-
-    -- 修复科技的问题
-    -- 注册科技 waterfill
-    if technology_exist("landfill") then
-        local waterfill_technology = table.deepcopy(
-                                         data.raw["technology"]["landfill"])
-
-        waterfill_technology.name = "waterfill"
-        waterfill_technology.icon =
-            "__base__/graphics/terrain/water-shallow/water-shallow-o.png"
-        waterfill_technology.icon_size = 64
-        waterfill_technology.icons = nil
-        waterfill_technology.effects = {
-            {type = "unlock-recipe", recipe = "waterfill"}
-        }
-
-        waterfill_technology.prerequisites =
-            waterfill_technology.prerequisites or {}
-
-        data:extend({waterfill_technology})
-
-        add_technology_prerequisite(waterfill_technology.name, "automation-2")
-    end
-end
-
---
---
---
-
--- 虚空箱, 虚空管
-if settings.startup["enable-void-chest-and-void-pipe"].value then
-    local void_purple_tint = {r = 0.55, g = 0.10, b = 0.80, a = 0.40}
-
-    -- 修复实体的问题
-    -- 注册实体 void-chest
-    if entity_exist("container", "iron-chest") then
-        local iron_chest_entity = data.raw["container"]["iron-chest"]
-        local void_chest_entity = table.deepcopy(iron_chest_entity)
-
-        void_chest_entity.name = "void-chest"
-        void_chest_entity.minable.result = "void-chest"
-        void_chest_entity.minable.results = nil
-        void_chest_entity.next_upgrade = nil
-        void_chest_entity.fast_replaceable_group = nil
-
-        if void_chest_entity.picture then
-            local picture = void_chest_entity.picture
-
-            if picture.layers then
-                local layer_count = #picture.layers
-
-                for index = 1, layer_count do
-                    local layer = picture.layers[index]
-
-                    if not layer.draw_as_shadow then
-                        local void_purple_layer = table.deepcopy(layer)
-
-                        void_purple_layer.tint = void_purple_tint
-
-                        table.insert(picture.layers, void_purple_layer)
-                    end
-                end
-            else
-                local void_purple_layer = table.deepcopy(picture)
-
-                void_purple_layer.tint = void_purple_tint
-                void_chest_entity.picture = {
-                    layers = {picture, void_purple_layer}
-                }
-            end
-        end
-
-        data:extend({void_chest_entity})
-    end
-
-    -- 注册实体 void-pipe
-    if entity_exist("pipe", "pipe") then
-        local pipe_entity = data.raw["pipe"]["pipe"]
-        local void_pipe_entity = table.deepcopy(pipe_entity)
-
-        void_pipe_entity.name = "void-pipe"
-        void_pipe_entity.minable.result = "void-pipe"
-        void_pipe_entity.minable.results = nil
-        void_pipe_entity.next_upgrade = nil
-        void_pipe_entity.fast_replaceable_group = nil
-
-        for picture_id, picture in pairs(void_pipe_entity.pictures) do
-            -- 排除流体显示, 连接显示, 背景图层
-            if not string.find(picture_id, "visualization", 1, true) and
-                not string.find(picture_id, "background", 1, true) and
-                not string.find(picture_id, "flow", 1, true) then
-                if picture.layers then
-                    local layer_count = #picture.layers
-
-                    for index = 1, layer_count do
-                        local layer = picture.layers[index]
-
-                        if not layer.draw_as_shadow then
-                            local void_purple_layer = table.deepcopy(layer)
-
-                            void_purple_layer.tint = void_purple_tint
-
-                            table.insert(picture.layers, void_purple_layer)
-                        end
-                    end
-                else
-                    local void_purple_layer = table.deepcopy(picture)
-
-                    void_purple_layer.tint = void_purple_tint
-                    void_pipe_entity.pictures[picture_id] = {
-                        layers = {picture, void_purple_layer}
-                    }
-                end
-            end
-        end
-
-        data:extend({void_pipe_entity})
-    end
-
-    -- 修复物品的问题
-    -- 注册物品 void-chest
-    if item_exist("iron-chest") then
-        local iron_chest_item = data.raw["item"]["iron-chest"]
-        local void_chest_item = table.deepcopy(iron_chest_item)
-
-        void_chest_item.name = "void-chest"
-        void_chest_item.order = (iron_chest_item.order or "iron-chest") ..
-                                    "-a[void]"
-        void_chest_item.place_result = "void-chest"
-
-        if void_chest_item.icons then
-            local icon_count = #void_chest_item.icons
-
-            for index = 1, icon_count do
-                local void_purple_icon = table.deepcopy(
-                                             void_chest_item.icons[index])
-
-                void_purple_icon.tint = void_purple_tint
-
-                table.insert(void_chest_item.icons, void_purple_icon)
-            end
-        else
-            local iron_chest_icon = {
-                icon = void_chest_item.icon,
-                icon_size = void_chest_item.icon_size or 64
-            }
-            local void_purple_icon = table.deepcopy(iron_chest_icon)
-
-            void_purple_icon.tint = void_purple_tint
-            void_chest_item.icons = {iron_chest_icon, void_purple_icon}
-            void_chest_item.icon = nil
-            void_chest_item.icon_size = nil
-        end
-
-        data:extend({void_chest_item})
-    end
-
-    -- 注册物品 void-pipe
-    if item_exist("pipe") then
-        local pipe_item = data.raw["item"]["pipe"]
-        local void_pipe_item = table.deepcopy(pipe_item)
-
-        void_pipe_item.name = "void-pipe"
-        void_pipe_item.order = (pipe_item.order or "pipe") .. "-a[void]"
-        void_pipe_item.place_result = "void-pipe"
-
-        if void_pipe_item.icons then
-            local icon_count = #void_pipe_item.icons
-
-            for index = 1, icon_count do
-                local void_purple_icon = table.deepcopy(
-                                             void_pipe_item.icons[index])
-
-                void_purple_icon.tint = void_purple_tint
-
-                table.insert(void_pipe_item.icons, void_purple_icon)
-            end
-        else
-            local pipe_icon = {
-                icon = void_pipe_item.icon,
-                icon_size = void_pipe_item.icon_size or 64
-            }
-            local void_purple_icon = table.deepcopy(pipe_icon)
-
-            void_purple_icon.tint = void_purple_tint
-            void_pipe_item.icons = {pipe_icon, void_purple_icon}
-            void_pipe_item.icon = nil
-            void_pipe_item.icon_size = nil
-        end
-
-        data:extend({void_pipe_item})
-    end
-
-    -- 修复配方的问题
-    -- 注册配方 void-chest, iron-chest-from-void-chest
-    if recipe_exist("iron-chest") then
-        -- 注册配方 void-chest
-        local iron_chest_recipe = data.raw["recipe"]["iron-chest"]
-        local void_chest_recipe = table.deepcopy(iron_chest_recipe)
-
-        void_chest_recipe.name = "void-chest"
-        void_chest_recipe.ingredients = {
-            {type = "item", name = "iron-chest", amount = 1}
-        }
-        void_chest_recipe.results = {
-            {type = "item", name = "void-chest", amount = 1}
-        }
-        void_chest_recipe.main_product = "void-chest"
-
-        -- 注册配方 iron-chest-from-void-chest
-        local iron_chest_recipe = data.raw["recipe"]["iron-chest"]
-        local iron_chest_from_void_chest_recipe = table.deepcopy(
-                                                      iron_chest_recipe)
-
-        iron_chest_from_void_chest_recipe.name = "iron-chest-from-void-chest"
-        iron_chest_from_void_chest_recipe.ingredients = {
-            {type = "item", name = "void-chest", amount = 1}
-        }
-        iron_chest_from_void_chest_recipe.results = {
-            {type = "item", name = "iron-chest", amount = 1}
-        }
-        iron_chest_from_void_chest_recipe.main_product = "iron-chest"
-
-        data:extend({void_chest_recipe, iron_chest_from_void_chest_recipe})
-    end
-
-    -- 注册配方 void-pipe, pipe-from-void-pipe
-    if recipe_exist("pipe") then
-        -- 注册配方 void-pipe
-        local pipe_recipe = data.raw["recipe"]["pipe"]
-        local void_pipe_recipe = table.deepcopy(pipe_recipe)
-
-        void_pipe_recipe.name = "void-pipe"
-        void_pipe_recipe.ingredients = {
-            {type = "item", name = "pipe", amount = 1}
-        }
-        void_pipe_recipe.results = {
-            {type = "item", name = "void-pipe", amount = 1}
-        }
-        void_pipe_recipe.main_product = "void-pipe"
-
-        -- 注册配方 pipe-from-void-pipe
-        local pipe_recipe = data.raw["recipe"]["pipe"]
-        local pipe_from_void_pipe_recipe = table.deepcopy(pipe_recipe)
-
-        pipe_from_void_pipe_recipe.name = "pipe-from-void-pipe"
-        pipe_from_void_pipe_recipe.ingredients = {
-            {type = "item", name = "void-pipe", amount = 1}
-        }
-        pipe_from_void_pipe_recipe.results = {
-            {type = "item", name = "pipe", amount = 1}
-        }
-        pipe_from_void_pipe_recipe.main_product = "pipe"
-
-        data:extend({void_pipe_recipe, pipe_from_void_pipe_recipe})
-    end
-end
-
---
---
---
-
 -- 水资源
 if settings.startup["enable-mineable-ground-water-resource"].value then
     -- 修复资源的问题
@@ -689,5 +390,304 @@ if settings.startup["enable-mineable-ground-water-resource"].value then
                     {}
             end
         end
+    end
+end
+
+--
+--
+--
+
+-- 造水料
+if settings.startup["enable-waterfill"].value then
+    -- 修复物品的问题
+    -- 注册物品 waterfill_item
+    if item_exist("landfill") then
+        local landfill_item = data.raw["item"]["landfill"]
+        local waterfill_item = table.deepcopy(landfill_item)
+
+        waterfill_item.name = "waterfill"
+        waterfill_item.icon =
+            "__base__/graphics/terrain/water-shallow/water-shallow-o.png"
+        waterfill_item.icons = nil
+        waterfill_item.order = (landfill_item.order or "a[landfill]") ..
+                                   "-a[waterfill]"
+        waterfill_item.place_as_tile = {
+            result = "water",
+            condition_size = 1,
+            condition = {layers = {ground_tile = true}}
+        }
+
+        data:extend({waterfill_item})
+    end
+
+    -- 修复配方的问题
+    -- 注册配方 waterfill
+    data:extend({
+        {
+            type = "recipe",
+            name = "waterfill",
+            order = "a",
+            categories = {"crafting-with-fluid"},
+            ingredients = {{type = "fluid", name = "water", amount = 200}},
+            results = {{type = "item", name = "waterfill", amount = 1}},
+            main_product = "waterfill",
+            enabled = false
+        }
+    })
+
+    -- 修复科技的问题
+    -- 注册科技 waterfill_technology
+    if technology_exist("landfill") then
+        local waterfill_technology = table.deepcopy(
+                                         data.raw["technology"]["landfill"])
+
+        waterfill_technology.name = "waterfill"
+        waterfill_technology.icon =
+            "__base__/graphics/terrain/water-shallow/water-shallow-o.png"
+        waterfill_technology.icon_size = 64
+        waterfill_technology.icons = nil
+        waterfill_technology.effects = {
+            {type = "unlock-recipe", recipe = "waterfill"}
+        }
+
+        waterfill_technology.prerequisites =
+            waterfill_technology.prerequisites or {}
+
+        data:extend({waterfill_technology})
+
+        add_technology_prerequisite(waterfill_technology.name, "automation-2")
+    end
+end
+
+--
+--
+--
+
+-- 虚空箱和虚空管
+if settings.startup["enable-void-chest-and-void-pipe"].value then
+    local void_purple_tint = {r = 0.55, g = 0.10, b = 0.80, a = 0.40}
+
+    -- 修复实体的问题
+    -- 注册实体 void_chest_entity
+    if entity_exist("container", "iron-chest") then
+        local iron_chest_entity = data.raw["container"]["iron-chest"]
+        local void_chest_entity = table.deepcopy(iron_chest_entity)
+
+        void_chest_entity.name = "void-chest"
+        void_chest_entity.minable.result = "void-chest"
+        void_chest_entity.minable.results = nil
+        void_chest_entity.next_upgrade = nil
+        void_chest_entity.fast_replaceable_group = nil
+
+        if void_chest_entity.picture then
+            local picture = void_chest_entity.picture
+
+            if picture.layers then
+                local layer_count = #picture.layers
+
+                for index = 1, layer_count do
+                    local layer = picture.layers[index]
+
+                    if not layer.draw_as_shadow then
+                        local void_purple_layer = table.deepcopy(layer)
+
+                        void_purple_layer.tint = void_purple_tint
+
+                        table.insert(picture.layers, void_purple_layer)
+                    end
+                end
+            else
+                local void_purple_layer = table.deepcopy(picture)
+
+                void_purple_layer.tint = void_purple_tint
+                void_chest_entity.picture = {
+                    layers = {picture, void_purple_layer}
+                }
+            end
+        end
+
+        data:extend({void_chest_entity})
+    end
+
+    -- 注册实体 void_pipe_entity
+    if entity_exist("pipe", "pipe") then
+        local pipe_entity = data.raw["pipe"]["pipe"]
+        local void_pipe_entity = table.deepcopy(pipe_entity)
+
+        void_pipe_entity.name = "void-pipe"
+        void_pipe_entity.minable.result = "void-pipe"
+        void_pipe_entity.minable.results = nil
+        void_pipe_entity.next_upgrade = nil
+        void_pipe_entity.fast_replaceable_group = nil
+
+        for picture_id, picture in pairs(void_pipe_entity.pictures) do
+            -- 排除流体显示, 连接显示, 背景图层
+            if not string.find(picture_id, "visualization", 1, true) and
+                not string.find(picture_id, "background", 1, true) and
+                not string.find(picture_id, "flow", 1, true) then
+                if picture.layers then
+                    local layer_count = #picture.layers
+
+                    for index = 1, layer_count do
+                        local layer = picture.layers[index]
+
+                        if not layer.draw_as_shadow then
+                            local void_purple_layer = table.deepcopy(layer)
+
+                            void_purple_layer.tint = void_purple_tint
+
+                            table.insert(picture.layers, void_purple_layer)
+                        end
+                    end
+                else
+                    local void_purple_layer = table.deepcopy(picture)
+
+                    void_purple_layer.tint = void_purple_tint
+                    void_pipe_entity.pictures[picture_id] = {
+                        layers = {picture, void_purple_layer}
+                    }
+                end
+            end
+        end
+
+        data:extend({void_pipe_entity})
+    end
+
+    -- 修复物品的问题
+    -- 注册物品 void_chest_item
+    if item_exist("iron-chest") then
+        local iron_chest_item = data.raw["item"]["iron-chest"]
+        local void_chest_item = table.deepcopy(iron_chest_item)
+
+        void_chest_item.name = "void-chest"
+        void_chest_item.order = (iron_chest_item.order or "iron-chest") ..
+                                    "-a[void]"
+        void_chest_item.place_result = "void-chest"
+
+        if void_chest_item.icons then
+            local icon_count = #void_chest_item.icons
+
+            for index = 1, icon_count do
+                local void_purple_icon = table.deepcopy(
+                                             void_chest_item.icons[index])
+
+                void_purple_icon.tint = void_purple_tint
+
+                table.insert(void_chest_item.icons, void_purple_icon)
+            end
+        else
+            local iron_chest_icon = {
+                icon = void_chest_item.icon,
+                icon_size = void_chest_item.icon_size or 64
+            }
+            local void_purple_icon = table.deepcopy(iron_chest_icon)
+
+            void_purple_icon.tint = void_purple_tint
+            void_chest_item.icons = {iron_chest_icon, void_purple_icon}
+            void_chest_item.icon = nil
+            void_chest_item.icon_size = nil
+        end
+
+        data:extend({void_chest_item})
+    end
+
+    -- 注册物品 void_pipe_item
+    if item_exist("pipe") then
+        local pipe_item = data.raw["item"]["pipe"]
+        local void_pipe_item = table.deepcopy(pipe_item)
+
+        void_pipe_item.name = "void-pipe"
+        void_pipe_item.order = (pipe_item.order or "pipe") .. "-a[void]"
+        void_pipe_item.place_result = "void-pipe"
+
+        if void_pipe_item.icons then
+            local icon_count = #void_pipe_item.icons
+
+            for index = 1, icon_count do
+                local void_purple_icon = table.deepcopy(
+                                             void_pipe_item.icons[index])
+
+                void_purple_icon.tint = void_purple_tint
+
+                table.insert(void_pipe_item.icons, void_purple_icon)
+            end
+        else
+            local pipe_icon = {
+                icon = void_pipe_item.icon,
+                icon_size = void_pipe_item.icon_size or 64
+            }
+            local void_purple_icon = table.deepcopy(pipe_icon)
+
+            void_purple_icon.tint = void_purple_tint
+            void_pipe_item.icons = {pipe_icon, void_purple_icon}
+            void_pipe_item.icon = nil
+            void_pipe_item.icon_size = nil
+        end
+
+        data:extend({void_pipe_item})
+    end
+
+    -- 修复配方的问题
+    -- 注册配方 void_chest_recipe, iron_chest_from_void_chest_recipe
+    if recipe_exist("iron-chest") then
+        -- 注册配方 void-chest
+        local iron_chest_recipe = data.raw["recipe"]["iron-chest"]
+        local void_chest_recipe = table.deepcopy(iron_chest_recipe)
+
+        void_chest_recipe.name = "void-chest"
+        void_chest_recipe.ingredients = {
+            {type = "item", name = "iron-chest", amount = 1}
+        }
+        void_chest_recipe.results = {
+            {type = "item", name = "void-chest", amount = 1}
+        }
+        void_chest_recipe.main_product = "void-chest"
+
+        -- 注册配方 iron-chest-from-void-chest
+        local iron_chest_recipe = data.raw["recipe"]["iron-chest"]
+        local iron_chest_from_void_chest_recipe = table.deepcopy(
+                                                      iron_chest_recipe)
+
+        iron_chest_from_void_chest_recipe.name = "iron-chest-from-void-chest"
+        iron_chest_from_void_chest_recipe.ingredients = {
+            {type = "item", name = "void-chest", amount = 1}
+        }
+        iron_chest_from_void_chest_recipe.results = {
+            {type = "item", name = "iron-chest", amount = 1}
+        }
+        iron_chest_from_void_chest_recipe.main_product = "iron-chest"
+
+        data:extend({void_chest_recipe, iron_chest_from_void_chest_recipe})
+    end
+
+    -- 注册配方 void_pipe_recipe, pipe_from_void_pipe_recipe
+    if recipe_exist("pipe") then
+        -- 注册配方 void-pipe
+        local pipe_recipe = data.raw["recipe"]["pipe"]
+        local void_pipe_recipe = table.deepcopy(pipe_recipe)
+
+        void_pipe_recipe.name = "void-pipe"
+        void_pipe_recipe.ingredients = {
+            {type = "item", name = "pipe", amount = 1}
+        }
+        void_pipe_recipe.results = {
+            {type = "item", name = "void-pipe", amount = 1}
+        }
+        void_pipe_recipe.main_product = "void-pipe"
+
+        -- 注册配方 pipe-from-void-pipe
+        local pipe_recipe = data.raw["recipe"]["pipe"]
+        local pipe_from_void_pipe_recipe = table.deepcopy(pipe_recipe)
+
+        pipe_from_void_pipe_recipe.name = "pipe-from-void-pipe"
+        pipe_from_void_pipe_recipe.ingredients = {
+            {type = "item", name = "void-pipe", amount = 1}
+        }
+        pipe_from_void_pipe_recipe.results = {
+            {type = "item", name = "pipe", amount = 1}
+        }
+        pipe_from_void_pipe_recipe.main_product = "pipe"
+
+        data:extend({void_pipe_recipe, pipe_from_void_pipe_recipe})
     end
 end

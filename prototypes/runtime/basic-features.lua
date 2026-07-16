@@ -159,11 +159,14 @@ end)
 
 -- 每 tick 触发
 script.on_event(defines.events.on_tick, function()
-    -- 运行时清空全部虚空箱的库存
-    runtime_clear_all_void_chests_inventory()
+    -- 判断是否启用虚空箱和虚空管
+    if settings.startup["enable-void-chest-and-void-pipe"].value then
+        -- 运行时清空全部虚空箱的库存
+        runtime_clear_all_void_chests_inventory()
 
-    -- 运行时清空全部虚空管的流体
-    runtime_clear_all_void_pipes_fluid()
+        -- 运行时清空全部虚空管的流体
+        runtime_clear_all_void_pipes_fluid()
+    end
 end)
 
 --
