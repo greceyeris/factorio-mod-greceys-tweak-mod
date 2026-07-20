@@ -3,8 +3,8 @@
 if mod_enabled("recycler") then
     -- 修复设置的问题
     -- 移除全部回收配方
-    if settings.startup["enable-remove-all-recycling-recipes"] and
-        settings.startup["enable-remove-all-recycling-recipes"].value then
+    if settings.startup["enable-remove-recycling-recipes-whose-names-end-in-recycling"] and
+        settings.startup["enable-remove-recycling-recipes-whose-names-end-in-recycling"].value then
         -- 修复配方的问题
         -- 遍历全部配方
         for recipe_name, recipe in pairs(data.raw["recipe"]) do

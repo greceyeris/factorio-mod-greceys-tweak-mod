@@ -251,8 +251,8 @@ local function runtime_initial_current_character_starter_kit(event)
     end
 
     -- 开局自动研究机器人速度
-    if settings.startup["enable-automatically-researches-worker-robots-speed-at-game-start"] and
-        settings.startup["enable-automatically-researches-worker-robots-speed-at-game-start"]
+    if settings.startup["enable-automatically-researches-worker-robots-speed-technologies-at-game-start"] and
+        settings.startup["enable-automatically-researches-worker-robots-speed-technologies-at-game-start"]
             .value then
         local force = runtime_get_current_player(event).force
 
