@@ -52,7 +52,8 @@ end
 -- 初始化时触发
 script.on_init(function()
     -- 开局时移除坠机现场
-    if settings.startup["enable-remove-crash-site-at-game-start"].value then
+    if settings.startup["enable-remove-crash-site-at-game-start"] and
+        settings.startup["enable-remove-crash-site-at-game-start"].value then
         local freeplay = remote.interfaces["freeplay"]
 
         if freeplay then
@@ -74,7 +75,8 @@ script.on_init(function()
     end
 
     -- 无限资源
-    if settings.startup["enable-infinite-resources"].value then
+    if settings.startup["enable-infinite-resources"] and
+        settings.startup["enable-infinite-resources"].value then
         -- 运行时设置全部资源产量为 1
         runtime_set_all_resource_amount_to_one()
     end
@@ -87,7 +89,8 @@ end)
 -- 配置变化时触发
 script.on_configuration_changed(function()
     -- 无限资源
-    if settings.startup["enable-infinite-resources"].value then
+    if settings.startup["enable-infinite-resources"] and
+        settings.startup["enable-infinite-resources"].value then
         -- 运行时设置全部资源产量为 1
         runtime_set_all_resource_amount_to_one()
     end
@@ -100,12 +103,14 @@ end)
 -- 区块生成时触发
 script.on_event(defines.events.on_chunk_generated, function(event)
     -- 清理地面装饰物
-    if settings.global["enable-remove-decorations"].value then
+    if settings.global["enable-remove-decorations"] and
+        settings.global["enable-remove-decorations"].value then
         event.surface.destroy_decoratives {area = event.area}
     end
 
     -- 无限资源
-    if settings.startup["enable-infinite-resources"].value then
+    if settings.startup["enable-infinite-resources"] and
+        settings.startup["enable-infinite-resources"].value then
         for _, resource in pairs(event.surface.find_entities_filtered({
             area = event.area,
             type = "resource"
@@ -140,7 +145,8 @@ end
 -- 按下快捷方式时触发
 script.on_event(defines.events.on_lua_shortcut, function(event)
     -- 判断是否启用开局时启用终为白日模式以及是否按下快捷方式 toggle-always-day-mode
-    if settings.startup["enable-always-day-mode-at-game-start"].value and
+    if settings.startup["enable-always-day-mode-at-game-start"] and
+        settings.startup["enable-always-day-mode-at-game-start"].value and
         event.prototype_name == "toggle-always-day-mode" then
         -- 运行时获取当前玩家
         local player = runtime_get_current_player(event)
@@ -160,7 +166,8 @@ end)
 -- 每 tick 触发
 script.on_event(defines.events.on_tick, function()
     -- 判断是否启用虚空箱和虚空管
-    if settings.startup["enable-void-chest-and-void-pipe"].value then
+    if settings.startup["enable-void-chest-and-void-pipe"] and
+        settings.startup["enable-void-chest-and-void-pipe"].value then
         -- 运行时清空全部虚空箱的库存
         runtime_clear_all_void_chests_inventory()
 
@@ -179,7 +186,8 @@ local function runtime_enable_alt_mode_at_game_start(event)
     local player = runtime_get_current_player(event)
 
     -- 运行时开局时启用 ALT 模式
-    if player.mod_settings["enable-alt-mode-at-game-start"].value then
+    if player.mod_settings["enable-alt-mode-at-game-start"] and
+        player.mod_settings["enable-alt-mode-at-game-start"].value then
         player.game_view_settings.show_entity_info = true
     end
 end
@@ -191,19 +199,22 @@ end
 -- 定义函数运行时初始化当前角色初始套装
 local function runtime_initial_current_character_starter_kit(event)
     -- 开局时清空全部库存与装备
-    if settings.startup["enable-clear-all-at-game-start"].value then
+    if settings.startup["enable-clear-all-at-game-start"] and
+        settings.startup["enable-clear-all-at-game-start"].value then
         -- 运行时清空当前角色全部库存与装备
         runtime_clear_current_character_all(event)
     end
 
     -- 开局时给予热能采矿机
-    if settings.startup["enable-give-burner-mining-drill-at-game-start"].value and
+    if settings.startup["enable-give-burner-mining-drill-at-game-start"] and
+        settings.startup["enable-give-burner-mining-drill-at-game-start"].value and
         not runtime_mod_enabled("greceys-sea-block-mod") then
         runtime_insert_item(event, "burner-mining-drill", 10)
     end
 
     -- 开局时给予建设套装
-    if settings.startup["enable-give-construction-kit-at-game-start"].value then
+    if settings.startup["enable-give-construction-kit-at-game-start"] and
+        settings.startup["enable-give-construction-kit-at-game-start"].value then
         -- 运行时清空当前角色盔甲
         runtime_clear_current_character_armor(event)
 
@@ -229,7 +240,8 @@ local function runtime_initial_current_character_starter_kit(event)
     end
 
     -- 开局时给予武器
-    if settings.startup["enable-give-weapon-at-game-start"].value then
+    if settings.startup["enable-give-weapon-at-game-start"] and
+        settings.startup["enable-give-weapon-at-game-start"].value then
         -- 运行时清空当前角色武器和弹药
         runtime_clear_current_character_weapon(event)
 
@@ -239,8 +251,9 @@ local function runtime_initial_current_character_starter_kit(event)
     end
 
     -- 开局自动研究机器人速度
-    if settings.startup["enable-automatically-researches-worker-robots-speed-at-game-start"]
-        .value then
+    if settings.startup["enable-automatically-researches-worker-robots-speed-at-game-start"] and
+        settings.startup["enable-automatically-researches-worker-robots-speed-at-game-start"]
+            .value then
         local force = runtime_get_current_player(event).force
 
         for i = 1, 5 do
@@ -284,7 +297,8 @@ end
 --
 
 -- 开局时移除坠机现场
-if settings.startup["enable-remove-crash-site-at-game-start"].value then
+if settings.startup["enable-remove-crash-site-at-game-start"] and
+    settings.startup["enable-remove-crash-site-at-game-start"].value then
     -- 角色创建时触发
     script.on_event(defines.events.on_player_created, function(event)
         -- 运行时初始化当前角色开局套件
@@ -294,7 +308,10 @@ if settings.startup["enable-remove-crash-site-at-game-start"].value then
         runtime_enable_alt_mode_at_game_start(event)
 
         -- 运行时设置终为白日模式的值
-        runtime_set_always_day_mode_value(true)
+        if settings.startup["enable-always-day-mode-at-game-start"] and
+            settings.startup["enable-always-day-mode-at-game-start"].value then
+            runtime_set_always_day_mode_value(true)
+        end
     end)
 else
     -- 动画完成, 跳过时触发
@@ -309,6 +326,9 @@ else
         runtime_enable_alt_mode_at_game_start(event)
 
         -- 运行时设置终为白日模式的值
-        runtime_set_always_day_mode_value(true)
+        if settings.startup["enable-always-day-mode-at-game-start"] and
+            settings.startup["enable-always-day-mode-at-game-start"].value then
+            runtime_set_always_day_mode_value(true)
+        end
     end)
 end

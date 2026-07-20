@@ -143,12 +143,6 @@ data:extend{
         order = "a[enable]-h[recipe]"
     }, {
         type = "bool-setting",
-        name = "enable-allow-select-quality-for-all-recipes",
-        setting_type = "startup",
-        default_value = false,
-        order = "a[enable]-h[recipe]"
-    }, {
-        type = "bool-setting",
         name = "enable-always-show-recipe-made-in",
         setting_type = "startup",
         default_value = false,
@@ -312,6 +306,10 @@ data:extend{
     }
 }
 
+--
+--
+--
+
 -- 修复模组的问题
 -- 修复模组 space-age 的问题
 if mods["space-age"] then
@@ -335,6 +333,10 @@ if mods["space-age"] then
     }
 end
 
+--
+--
+--
+
 -- 修复模组 quality 的问题
 if mods["quality"] then
     -- startup-settings
@@ -349,6 +351,10 @@ if mods["quality"] then
         }
     }
 end
+
+--
+--
+--
 
 -- 修复模组 recycler 的问题
 if mods["recycler"] then

@@ -1,4 +1,9 @@
 ---------------------------------------------------------------------------------------------------
+Version: 21.2.2
+Date: 2026-07-20
+  Bugfixes:
+    - Fixed issue: https://gitee.com/greceyeris/factorio-mod-greceys-tweak-mod/issues/IK1JXT.
+---------------------------------------------------------------------------------------------------
 Version: 21.2.1
 Date: 2026-07-16
   Bugfixes:
@@ -47,9 +52,6 @@ Date: 2026-07-15
       - Added Waterfill.
     - Equipment features:
       - Added Modify All Equipment Grid Occupancy Sizes to 1×1.
-        - Recipe features:
-      - Added Allow All Recipes to Use All Modules.
-      - Added Always Show Recipe Made In.
     - Recipe features:
       - Added Allow All Recipes to Use All Modules.
       - Added Always Show Recipe Made In.
@@ -79,17 +81,16 @@ Date: 2026-07-15
       - Added Item Stack Size Multiplier.
 
   Compatibility:
-    - Quality Mod features:
-      - Recipe features:
-        - Allow Quality Selection for All Recipes.
-    - Recycler Mod features:
-      - Recipe features:
-        - Remove All Recycling Recipes.
-    - Space Age Mod features:
-      - Entity features:
+    - Entity features:
+      - Space Age Mod features:
         - Remove Machine Freezing.
-      - Item features:
-        - Remove Item Spoilage.
+    - Item features:
+      - Remove Item Spoilage.
+    - Recipe features:
+      - Quality Mod features:
+        - Allow Quality Selection for All Recipes.
+      - Recycler Mod features:
+        - Remove All Recycling Recipes.
 
   Graphics:
     - Added always-day shortcut and farthest-distance-position visualization graphics.

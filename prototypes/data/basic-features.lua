@@ -1,5 +1,6 @@
 -- 开局时启用终为白日模式
-if settings.startup["enable-always-day-mode-at-game-start"].value then
+if settings.startup["enable-always-day-mode-at-game-start"] and
+    settings.startup["enable-always-day-mode-at-game-start"].value then
     -- 修复快捷方式的问题
     -- 注册快捷方式 toggle-always-day-mode
     data:extend({
@@ -22,7 +23,8 @@ end
 --
 
 -- 电力熔炉
-if settings.startup["enable-electric-furnaces"].value then
+if settings.startup["enable-electric-furnaces"] and
+    settings.startup["enable-electric-furnaces"].value then
     local electric_blue_tint = {r = 0.20, g = 0.65, b = 1.00, a = 0.35}
 
     -- 修复实体的问题
@@ -301,7 +303,8 @@ end
 --
 
 -- 水资源
-if settings.startup["enable-mineable-ground-water-resource"].value then
+if settings.startup["enable-mineable-ground-water-resource"] and
+    settings.startup["enable-mineable-ground-water-resource"].value then
     -- 修复资源的问题
     -- 注册资源和自动放置控制
     if resource_exist("crude-oil") then
@@ -398,7 +401,8 @@ end
 --
 
 -- 造水料
-if settings.startup["enable-waterfill"].value then
+if settings.startup["enable-waterfill"] and
+    settings.startup["enable-waterfill"].value then
     -- 修复物品的问题
     -- 注册物品 waterfill_item
     if item_exist("landfill") then
@@ -464,7 +468,8 @@ end
 --
 
 -- 虚空箱和虚空管
-if settings.startup["enable-void-chest-and-void-pipe"].value then
+if settings.startup["enable-void-chest-and-void-pipe"] and
+    settings.startup["enable-void-chest-and-void-pipe"].value then
     local void_purple_tint = {r = 0.55, g = 0.10, b = 0.80, a = 0.40}
 
     -- 修复实体的问题
